@@ -17,5 +17,5 @@ jupyter
 notebook
 stackstac
 odc-stac
-xgboost
-lightgbm
+torch
+optuna
