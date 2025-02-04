@@ -18,3 +18,4 @@ notebook
 stackstac
 odc-stac
 folium
+openpyxl
