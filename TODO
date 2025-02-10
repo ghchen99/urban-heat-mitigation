@@ -1,0 +1,9 @@
+# TODO List for Urban Heat Mitigation Project
+
+## Sentinel 2 GeoTIFF Imaging
+- [ ] Remove cloud cover & retain date accuracy
+- [ ] Explore alternative methods to median
+
+## Model Training
+- [ ] Explore methods for reducing overfitting
+- [ ] Explore pre-trained models tailored for spectral banding
