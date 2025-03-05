@@ -176,3 +176,5 @@ results/
 Submission_template.csv
 *.pdf
 *.csv
+*.png
+*.pkl

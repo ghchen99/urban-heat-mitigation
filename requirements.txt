@@ -1,4 +1,4 @@
-numpy
+numpy<2.0
 pandas
 scikit-learn
 xarray
@@ -17,5 +17,5 @@ jupyter
 notebook
 stackstac
 odc-stac
-torch
-optuna
+folium
+openpyxl
