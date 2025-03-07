@@ -178,3 +178,5 @@ Submission_template.csv
 *.csv
 *.png
 *.pkl
+
+notebooks/catboost_info/
