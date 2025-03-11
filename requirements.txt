@@ -19,3 +19,8 @@ stackstac
 odc-stac
 folium
 openpyxl
+xgboost
+lightgbm
+catboost
+optuna
+pysal
