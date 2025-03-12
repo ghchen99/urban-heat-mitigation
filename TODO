@@ -4,6 +4,8 @@
 - [ ] Remove cloud cover & retain date accuracy
 - [ ] Explore alternative methods to median, e.g., temporal analytics
 
+## Incorporate External Data Sources
+
 ## Model Training
 - [ ] Correlation feature engineering
 - [ ] Interaction features
