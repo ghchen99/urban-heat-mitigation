@@ -25,3 +25,5 @@ catboost
 optuna
 pysal
 tensorflow
+shapely
+scikit-learn
