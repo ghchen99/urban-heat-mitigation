@@ -1,7 +1,5 @@
 # TODO List for Urban Heat Mitigation Project
 
-## Sentinel 2 GeoTIFF Imaging
-- [ ] Remove cloud cover & retain date accuracy
-- [ ] Explore alternative methods to median, e.g., temporal analytics
-
 ## Incorporate External Data Sources
+- Explore 500m radius and mapping building footprints
+- Explore feature reduction
