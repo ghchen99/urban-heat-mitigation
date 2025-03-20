@@ -27,3 +27,4 @@ pysal
 tensorflow
 shapely
 scikit-learn
+scikit-image

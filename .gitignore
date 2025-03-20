@@ -180,3 +180,5 @@ Submission_template.csv
 *.pkl
 
 notebooks/catboost_info/
+
+*.geojson
