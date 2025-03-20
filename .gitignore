@@ -171,13 +171,9 @@ cython_debug/
 .pypirc
 
 # Large data files
-data/
 results/
 Submission_template.csv
 *.pdf
-*.csv
 *.pkl
 
 notebooks/catboost_info/
-
-*.geojson
