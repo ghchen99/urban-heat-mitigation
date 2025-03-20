@@ -1,37 +1,136 @@
-# The 2025 EY Open Science AI and Data Challenge: Cooling Urban Heat Islands
+# **EY Open Science AI & Data Challenge 2025: Cooling Urban Heat Islands**  
 
-The 2025 AI & data challenge is focused on a phenomenon known as the urban heat island effect, a situation that occurs due to the high density of buildings and lack of green space and water bodies in urban areas. Temperature variations between rural and urban environments can exceed 10-degrees Celsius in some cases and cause significant health-, social- and energy-related issues. Those particularly vulnerable to heat-related problems include young children, older adults, outdoor workers, and low-income populations.
+![Urban Heat Island Effect](./assets/uhi_analysis_plots.png)  
 
-All output from the challenge can help bring cooling relief to vulnerable communities, but entrants with top scores will take home cash prizes and receive an invitation to an exciting awards celebration.
+This repository contains my submission for the **2025 EY Open Science AI and Data Challenge**, which focuses on predicting Urban Heat Island (UHI) hotspots in New York City using machine learning. The goal is to develop a regression model that predicts UHI Index values and identifies key contributing factors without directly using latitude and longitude as features.  
 
-## Problem Statement
+## **Project Overview**  
 
-The goal of the challenge is to develop a machine learning model to predict heat island hotspots in an urban location. Additionally, the model should be designed to discern and highlight the key factors that contribute significantly to the development of these hotspots within city environments.
+Urban Heat Islands (UHIs) are a major environmental challenge, causing increased temperatures in densely built-up urban areas. This project leverages satellite imagery and geospatial datasets to analyse urban heat distribution in the Bronx and Manhattan regions. By processing Sentinel-2 satellite data and building footprint information, I train a predictive model that helps identify UHI hotspots and understand the underlying causes.  
 
-Participants will be given near-surface air temperature data in an index format, which was collected on 24 July 2021 using a ground traverse in the Bronx and Manhattan region of New York City. This dataset constitutes traverse points (latitude and longitude) and their corresponding UHI (Urban Heat Island) index values. Participants will use this dataset to build a regression model to predict UHI Index values for a given set of locations.
+## **Repository Contents**  
 
-It is important to understand that the UHI Index at any given location is indicative of the relative temperature difference at that specific point when compared to the city's average temperature. This index serves as a crucial metric for assessing the intensity of heat within different urban zones.
+- **`Sentinel2_GeoTIFF.ipynb`** – Extracts spectral band data from Sentinel-2 satellite imagery using the Microsoft Planetary Computer. These bands provide crucial information about land cover, vegetation, and surface materials that influence heat retention.  
+- **`Building_Footprint.ipynb`** – Processes the `Building_Footprint.kml` dataset to extract urban structure data, which can impact temperature variations.  
+- **`UHI Experiment Sample Benchmark Notebook V5.ipynb`** – Implements machine learning models to predict UHI Index values, evaluates model performance, and identifies key contributing factors.  
 
-## Data Description
+This repository provides a structured approach to addressing the UHI challenge, incorporating geospatial feature extraction and advanced modeling techniques.
 
-### Target Dataset `Training_data_uhi_index.csv`
+## 1. Sentinel-2 Data Processing (`Sentinel2_GeoTIFF.ipynb`)
+This notebook handles satellite imagery processing from Sentinel-2:
+```python
+# Define the bounding box for the area of interest
+lower_left = (40.75, -74.01)
+upper_right = (40.88, -73.86)
 
-Near-surface air temperature data in an index format was collected on 24 July 2021 across the Bronx and Manhattan regions of New York City in the United States. The data was collected in the afternoon between 3:00 pm and 4:00 pm. This dataset includes time stamps, traverse points (latitude and longitude) and the corresponding Urban Heat Island (UHI) Index values for 11229 data points. These UHI Index values are the target parameters for your model.
+# Define the time window
+time_window = "2021-06-01/2021-09-01"
 
-Note: Participants are strictly prohibited from using Longitude and Latitude values as features in building their machine learning models. Submissions that employ longitude and latitude values as model features will be disqualified. These values should only be utilized for understanding the attributes and characteristics of the locations.
+# Search for Sentinel-2 imagery with low cloud cover
+stac = pystac_client.Client.open("https://planetarycomputer.microsoft.com/api/stac/v1")
+search = stac.search(
+    bbox=bounds, 
+    datetime=time_window,
+    collections=["sentinel-2-l2a"],
+    query={"eo:cloud_cover": {"lt": 30}},
+)
+```
+Key features:
 
-### Feature Datasets
+- Connects to Microsoft Planetary Computer's STAC API
+- Searches for Sentinel-2 imagery with low cloud cover (<30%)
+- Loads spectral bands (Red, Green, Blue, NIR, SWIR) for analysis
+- Creates visualizations of different spectral indices:
+    - NDVI (Normalized Difference Vegetation Index) for vegetation coverage
+    - NDBI (Normalized Difference Buildup Index) for urban areas
+    - NDWI (Normalized Difference Water Index) for water bodies
+- Exports data as GeoTIFF files for further analysis
 
-Participants can leverage many datasets to consider for their models. Their ability to analyze which datasets and parameters are the most important for model development will determine the model performance. The following are the recommended satellite datasets:
+## 2. Building Footprint Analysis (`Building_Footprint.ipynb`)
+This notebook focuses on analysing building characteristics and their impact on urban heat islands:
+```python
+def analyze_building_footprints_for_uhi(df, output_file=None, plot=False, calculate_advanced_metrics=True):
+    # Calculate basic building features
+    gdf = calculate_building_features(df)
+    
+    # Calculate density-based metrics (100m and 500m radii)
+    gdf = calculate_density_metrics(gdf, radius_m=100)
+    gdf = calculate_density_metrics(gdf, radius_m=500)
+    
+    # Calculate advanced metrics if requested
+    if calculate_advanced_metrics:
+        # Add morphological analysis
+        gdf = calculate_morphological_metrics(gdf)
+        
+        # Add ventilation potential analysis
+        gdf = calculate_ventilation_potential(gdf)
+    
+    # Prepare features for modeling
+    gdf = prepare_features_for_modeling(gdf)
+    
+    # Generate plots if requested
+    if plot:
+        # Create visualization plots...
+```
 
-* European Sentinel-2 optical satellite data
-* NASA Landsat optical satellite data
+Key features:
 
-These datasets can be extracted from Microsoft Planetary Computer Portal's data catalog. Please see the sample notebooks for more details: `Landsat_LST.ipynb` and `Sentinel2_GeoTIFF.ipynb`.
+- Processes KML building footprint data to extract building geometries
+- Calculates numerous UHI-relevant metrics:
+    - Building physical properties (area, perimeter, compactness)
+    - Urban density indices at multiple scales (100m, 500m)
+    - Morphological metrics like rugosity and building alignment
+    - Ventilation potential and wind exposure estimates
+- Generates standardized features for UHI modeling
+- Creates visualisation plots of building metrics
 
-### Additional Datasets
 
-Participants can also explore the following datasets in their model development journey:
+## 3. UHI Prediction Model (`UHI Experiment Sample Benchmark Notebook V5.ipynb`)
+This notebook implements the machine learning pipeline for UHI prediction:
 
-* Building footprints of the Bronx and Manhattan regions `Building_Footprint.kml`
-* Detailed local weather dataset of the Bronx and Manhattan regions on 24 July 2021, collected every 5 minutes `NY_Mesonet_Weather.xlsx`
+```python
+def map_satellite_data_with_buffer(tiff_path, csv_path, buffer_radius=700, 
+                                  weighting='gaussian', land_cover_mask=None, 
+                                  outlier_threshold=3, min_valid_pixels=5,
+                                  adaptive_weighting=False, drop_invalid=True,
+                                  handle_out_of_bounds='nearest'):
+    # Extracts satellite band values with advanced buffer techniques
+    # ...
+
+# Create features at multiple buffer distances
+buffer_distances = [250, 500, 1000]
+multi_scale_features = []
+
+for buffer in buffer_distances:
+    buffer_data = map_satellite_data_with_buffer(
+        tiff_path='../data/S2_sample.tiff',
+        csv_path='../data/Training_data_uhi_index_2025-02-18.csv',
+        buffer_radius=buffer,
+        adaptive_weighting=True,
+        outlier_threshold=2.5,
+        drop_invalid=False,
+        handle_out_of_bounds='knn'
+    )
+    # ...
+```
+
+Key features:
+
+- Extracts Sentinel-2 spectral information at various buffer distances
+- Applies sophisticated spatial interpolation methods
+- Derives 100+ spectral indices related to urban heat
+- Joins building footprint features with spectral data
+- Implements feature selection to identify key predictors
+- Evaluates multiple ML models:
+    - RandomForest, GradientBoosting, ExtraTrees
+    - Linear models (ElasticNet, Ridge)
+    - SVR, KNN, XGBoost, LightGBM
+
+
+## Contributions
+
+- Fork the repository: Create your own copy of the project
+- Set up your environment: Install the required dependencies (see `requirements.txt`)
+- Create a branch: Make your changes in a new branch
+- Test your changes: Ensure your code runs correctly and maintains model performance
+- Submit a pull request: Share your improvements with the community
